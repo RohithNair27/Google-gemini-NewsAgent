@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>NewsAgent Feed</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#135bec",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101622",
+              "surface-light": "#ffffff",
+              "surface-dark": "#1a2230",
+              "text-main": "#0d121b",
+              "text-secondary": "#4c669a",
+              "border-light": "#e7ebf3",
+              "border-dark": "#2a3441",
+            },
+            fontFamily: {
+              display: ["Work Sans", "sans-serif"],
+            },
+            borderRadius: {
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
+              full: "9999px",
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark font-display antialiased text-text-main dark:text-white transition-colors duration-200"
+  >
+    <div
+      class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden"
+    >
+      <header
+        class="sticky top-0 z-50 flex items-center justify-start gap-6 border-b border-solid border-border-light dark:border-border-dark bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur px-6 py-3 lg:px-10"
+      >
+        <div class="flex items-center gap-3 text-text-main dark:text-white">
+          <div class="text-primary flex items-center justify-center">
+            <span class="material-symbols-outlined text-3xl">newspaper</span>
+          </div>
+          <h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">
+            NewsAgent
+          </h2>
+        </div>
+        <details class="relative group ml-auto">
+          <summary
+            class="list-none [&amp;::-webkit-details-marker]:hidden cursor-pointer flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-background-light dark:hover:bg-white/5 border border-transparent hover:border-border-light dark:hover:border-border-dark transition-all text-sm font-medium text-text-secondary select-none"
+          >
+            <span class="material-symbols-outlined text-[20px]">settings</span>
+            <span class="hidden sm:inline">Configuration</span>
+            <span
+              class="material-symbols-outlined text-[20px] transition-transform group-open:rotate-180"
+              >expand_more</span
+            >
+          </summary>
+          <div
+            class="absolute top-full right-0 mt-3 w-80 p-5 bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl border border-border-light dark:border-border-dark z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+          >
+            <label
+              class="block text-sm font-bold text-text-main dark:text-white mb-2"
+              >Gemini API Key</label
+            >
+            <p class="text-xs text-text-secondary mb-3">
+              Enter your API key to enable AI features.
+            </p>
+            <div class="relative flex items-center mb-3">
+              <span class="absolute left-3 text-text-secondary">
+                <span class="material-symbols-outlined text-[18px]">key</span>
+              </span>
+              <input
+                class="w-full h-10 pl-9 pr-3 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main dark:text-white placeholder:text-text-secondary/60 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm"
+                placeholder="Paste your key here"
+                type="password"
+              />
+            </div>
+            <button
+              class="w-full h-9 bg-primary hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+            >
+              Save Key
+            </button>
+          </div>
+        </details>
+      </header>
+      <main class="flex-1 px-4 py-8 md:px-10 lg:px-40 flex justify-center">
+        <div class="flex flex-col max-w-[1200px] w-full gap-8">
+          <div class="flex flex-col gap-6">
+            <h1
+              class="text-3xl md:text-[32px] font-bold leading-tight text-text-main dark:text-white"
+            >
+              Top Stories
+            </h1>
+            <div
+              class="flex flex-col md:flex-row gap-4 items-end md:items-stretch bg-surface-light dark:bg-surface-dark p-4 rounded-xl shadow-sm border border-border-light dark:border-border-dark"
+            >
+              <div class="flex-1 w-full md:max-w-[280px]">
+                <label
+                  class="block text-sm font-medium text-text-main dark:text-gray-300 mb-2"
+                  >Category</label
+                >
+                <div class="relative">
+                  <select
+                    class="appearance-none w-full h-12 px-4 pr-10 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary cursor-pointer"
+                  >
+                    <option disabled="" selected="" value="">
+                      Select Category
+                    </option>
+                    <option value="tech">Technology</option>
+                    <option value="politics">Politics</option>
+                    <option value="business">Business</option>
+                    <option value="sports">Sports</option>
+                  </select>
+                  <div
+                    class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-text-secondary dark:text-gray-400"
+                  >
+                    <span class="material-symbols-outlined">expand_more</span>
+                  </div>
+                </div>
+              </div>
+              <div class="flex-1 w-full">
+                <label
+                  class="block text-sm font-medium text-text-main dark:text-gray-300 mb-2"
+                  >Location</label
+                >
+                <div class="relative flex items-center">
+                  <input
+                    class="w-full h-12 pl-4 pr-12 rounded-lg bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark text-text-main dark:text-white placeholder:text-text-secondary dark:placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    placeholder="Enter City or Zip code"
+                    type="text"
+                  />
+                  <div
+                    class="absolute right-0 top-0 h-full w-12 flex items-center justify-center text-text-secondary dark:text-gray-400"
+                  >
+                    <span class="material-symbols-outlined">search</span>
+                  </div>
+                </div>
+              </div>
+              <button
+                class="h-12 w-full md:w-auto px-6 bg-primary hover:bg-blue-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mt-4 md:mt-0 shadow-lg shadow-primary/30"
+              >
+                <span class="material-symbols-outlined text-[20px]"
+                  >refresh</span
+                >
+                <span>Update Feed</span>
+              </button>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
+            <article
+              class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            >
+              <div class="relative h-72 w-full overflow-hidden">
+                <div
+                  class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                  data-alt="Modern office building with glass facade reflecting blue sky"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDE6OvP6wWzvUY0AFK1RfKxnwWCbGXME9UqzOLTlf7zyRc72O1D_U_z-1nqaKUAwCA3aMsn3I13GYts10js5ErinhyrgkBWllgSIli9_qDv6q0_giXFkhNL26S2rTznExRhjzCtoftDCYOvBuxMMh53s3jNFYu_ldWczFp-VVQ4FPykkTWBfXWs88qI5_hkujtXgrWcMnyBOBTclKmEgCAXcDDhrGh0bWyxt0JYFYRJpzIBZbqHszPCymapM-zcdic58NGfFvwaDBHS');
+                  "
+                ></div>
+                <span
+                  class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm"
+                  >Business</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 p-8">
+                <div
+                  class="flex items-center gap-2 text-base font-medium text-text-secondary dark:text-gray-400 mb-4"
+                >
+                  <span>Bloomberg</span>
+                </div>
+                <h3
+                  class="text-3xl font-bold text-text-main dark:text-white mb-4 leading-tight group-hover:text-primary transition-colors"
+                >
+                  Local Tech Startup Raises Series B Funding Round
+                </h3>
+                <p
+                  class="text-text-secondary dark:text-gray-400 text-lg leading-relaxed mb-8"
+                >
+                  The innovative AI-driven analytics platform has secured $45M
+                  in fresh capital to expand its engineering team and enter new
+                  markets. This significant investment marks a turning point for
+                  the local tech ecosystem.
+                </p>
+                <div
+                  class="mt-auto pt-6 border-t border-border-light dark:border-border-dark flex justify-start items-center"
+                >
+                  <a
+                    class="text-primary text-lg font-bold flex items-center gap-1 group/link"
+                    href="#"
+                  >
+                    Read More
+                    <span
+                      class="material-symbols-outlined text-[24px] transition-transform group-hover/link:translate-x-1"
+                      >arrow_forward</span
+                    >
+                  </a>
+                </div>
+              </div>
+            </article>
+            <article
+              class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            >
+              <div class="relative h-72 w-full overflow-hidden">
+                <div
+                  class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                  data-alt="Green city park with people walking and trees"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuClLFH9P2d7ooq6YFiitOxX-w2OMwLUYg49dfBHOU1LE8DLxLMTJ_mspOEbvluWsuTPxusa_6bJMFXoinOs_5De-amRnO4ExINBDOaehuzZoAPOAiNEqMEpI306-_Rwwf7j2MBB_l-Cd0-9p47querILTwmm6F5wxQow1MvZ_x3-M8NJo1YdCXeoKsLXlOFpbkGvAdrlQ16zi0tvyk4V8hpahtGGDhh5KYJ9_YuKJPERWii73JtuHIjk9Y9f1Nj033eI4MofBGc2dwn');
+                  "
+                ></div>
+                <span
+                  class="absolute top-4 left-4 bg-green-600 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm"
+                  >Politics</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 p-8">
+                <div
+                  class="flex items-center gap-2 text-base font-medium text-text-secondary dark:text-gray-400 mb-4"
+                >
+                  <span>City Gazette</span>
+                </div>
+                <h3
+                  class="text-3xl font-bold text-text-main dark:text-white mb-4 leading-tight group-hover:text-primary transition-colors"
+                >
+                  City Council Approves New Downtown Green Space Project
+                </h3>
+                <p
+                  class="text-text-secondary dark:text-gray-400 text-lg leading-relaxed mb-8"
+                >
+                  After months of deliberation, the council voted unanimously to
+                  transform the old industrial lot into a public park for
+                  residents. The project is expected to break ground early next
+                  year and will feature community gardens and playgrounds.
+                </p>
+                <div
+                  class="mt-auto pt-6 border-t border-border-light dark:border-border-dark flex justify-start items-center"
+                >
+                  <a
+                    class="text-primary text-lg font-bold flex items-center gap-1 group/link"
+                    href="#"
+                  >
+                    Read More
+                    <span
+                      class="material-symbols-outlined text-[24px] transition-transform group-hover/link:translate-x-1"
+                      >arrow_forward</span
+                    >
+                  </a>
+                </div>
+              </div>
+            </article>
+            <article
+              class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            >
+              <div class="relative h-72 w-full overflow-hidden">
+                <div
+                  class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                  data-alt="Stock market graph chart on a digital display"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDSi7hnR7_upL5KxX8lxki_uAyq72HtSo0Op3B4Oj5O_KQII722-UGmmiaKfjDKmrCfDQ0jXppUeZH-zrFNoSmvEUniEVDtOmJt5tvH16QLQw1_ao8DyzeXeDlp1s8GOqMVMEtKojLVhRJkVHpLLgQ1xqrMUqyThN5-hZm65YMFWdrdkX0bB6C3JJk_Zxh11vV_3SSMYl6wddqKgCDDukWXYHLMXtJ80fLq2qT0vk6N8Uss0nSyec7YhRHt5VeA9p1udM579fuPCTSm');
+                  "
+                ></div>
+                <span
+                  class="absolute top-4 left-4 bg-purple-600 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm"
+                  >Finance</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 p-8">
+                <div
+                  class="flex items-center gap-2 text-base font-medium text-text-secondary dark:text-gray-400 mb-4"
+                >
+                  <span>Financial Times</span>
+                </div>
+                <h3
+                  class="text-3xl font-bold text-text-main dark:text-white mb-4 leading-tight group-hover:text-primary transition-colors"
+                >
+                  Global Markets React to Latest Inflation Data Reports
+                </h3>
+                <p
+                  class="text-text-secondary dark:text-gray-400 text-lg leading-relaxed mb-8"
+                >
+                  Investors are proceeding with caution as new economic
+                  indicators suggest a shift in monetary policy might be coming
+                  sooner than expected. Major indices saw slight volatility as
+                  traders digest the implications for the coming quarter.
+                </p>
+                <div
+                  class="mt-auto pt-6 border-t border-border-light dark:border-border-dark flex justify-start items-center"
+                >
+                  <a
+                    class="text-primary text-lg font-bold flex items-center gap-1 group/link"
+                    href="#"
+                  >
+                    Read More
+                    <span
+                      class="material-symbols-outlined text-[24px] transition-transform group-hover/link:translate-x-1"
+                      >arrow_forward</span
+                    >
+                  </a>
+                </div>
+              </div>
+            </article>
+            <article
+              class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            >
+              <div class="relative h-72 w-full overflow-hidden">
+                <div
+                  class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                  data-alt="A smartphone displaying mobile apps on screen"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC8rUpMtiRyMgGFCKtMW9n8BuyiGafrjp1lZfBW95Qvh52M4cZi_zhBsCrgvM5zhNJLKpkJ0jrSeRYww-BX9Jm7O-cLBKWiAEN1SpJtEtmdOoKus5YPcXVzilj8eM1-XwH22PbwYFdfS8diIr_Z9DLVWH7pYDlyR8HOSIpdN9EJzY9T9cplz8DEHDiRZ9NMi0nflhpaUveC4sWzw_EZbDds239CoP6YrN_qdvvkcecTNwv2gxULsvVqXwFkjEXdRxKMPrtJYgPea-4Y');
+                  "
+                ></div>
+                <span
+                  class="absolute top-4 left-4 bg-primary text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm"
+                  >Technology</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 p-8">
+                <div
+                  class="flex items-center gap-2 text-base font-medium text-text-secondary dark:text-gray-400 mb-4"
+                >
+                  <span>TechCrunch</span>
+                </div>
+                <h3
+                  class="text-3xl font-bold text-text-main dark:text-white mb-4 leading-tight group-hover:text-primary transition-colors"
+                >
+                  The Future of Mobile Computing: What to Expect in 2024
+                </h3>
+                <p
+                  class="text-text-secondary dark:text-gray-400 text-lg leading-relaxed mb-8"
+                >
+                  New foldable screens and advanced battery technologies are set
+                  to revolutionize how we interact with our handheld devices.
+                  Industry leaders are focusing on seamless integration of AI
+                  assistants into everyday mobile operating systems.
+                </p>
+                <div
+                  class="mt-auto pt-6 border-t border-border-light dark:border-border-dark flex justify-start items-center"
+                >
+                  <a
+                    class="text-primary text-lg font-bold flex items-center gap-1 group/link"
+                    href="#"
+                  >
+                    Read More
+                    <span
+                      class="material-symbols-outlined text-[24px] transition-transform group-hover/link:translate-x-1"
+                      >arrow_forward</span
+                    >
+                  </a>
+                </div>
+              </div>
+            </article>
+            <article
+              class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            >
+              <div class="relative h-72 w-full overflow-hidden">
+                <div
+                  class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                  data-alt="Modern art gallery exhibition with abstract paintings"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDRdnUiygcx5mJXtF_lpXKllL0dOBVWYVG4LL70eddjT0HfwZqI5SEMaHjUhE_G7WglNMucnmB7jA3CPtLSA_dONSi0tcWlrg_BGvhEezyjbrguyzm6z_jhBCLrnzYcMjWGLokm5hkDslVLItCRzhQrRw3tcS3LUvUEuopoett7KPONMfjA_i3Y_qImc2Ew4sG6rQIq5wobRJt8AqIT-co8_hm5syeZBbRSpo_897JwqBSWp5bxH9p7ikBuf_TZ1zRMW1a1XDleLslJ');
+                  "
+                ></div>
+                <span
+                  class="absolute top-4 left-4 bg-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm"
+                  >Arts</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 p-8">
+                <div
+                  class="flex items-center gap-2 text-base font-medium text-text-secondary dark:text-gray-400 mb-4"
+                >
+                  <span>Art Weekly</span>
+                </div>
+                <h3
+                  class="text-3xl font-bold text-text-main dark:text-white mb-4 leading-tight group-hover:text-primary transition-colors"
+                >
+                  Contemporary Exhibition Opens at Metropolitan Museum
+                </h3>
+                <p
+                  class="text-text-secondary dark:text-gray-400 text-lg leading-relaxed mb-8"
+                >
+                  The highly anticipated retrospective features over 200 works
+                  from leading artists of the 21st century. Critics are calling
+                  it a landmark event that perfectly captures the spirit of the
+                  modern artistic movement.
+                </p>
+                <div
+                  class="mt-auto pt-6 border-t border-border-light dark:border-border-dark flex justify-start items-center"
+                >
+                  <a
+                    class="text-primary text-lg font-bold flex items-center gap-1 group/link"
+                    href="#"
+                  >
+                    Read More
+                    <span
+                      class="material-symbols-outlined text-[24px] transition-transform group-hover/link:translate-x-1"
+                      >arrow_forward</span
+                    >
+                  </a>
+                </div>
+              </div>
+            </article>
+            <article
+              class="group flex flex-col bg-surface-light dark:bg-surface-dark rounded-xl overflow-hidden border border-border-light dark:border-border-dark hover:shadow-lg transition-all duration-300 hover:-translate-y-1"
+            >
+              <div class="relative h-72 w-full overflow-hidden">
+                <div
+                  class="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                  data-alt="Runner sprinting on a track during sunset"
+                  style="
+                    background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDa_F-9GCJ3_5JKzCbLqRoOVFW1QsAZRvaB-Yjkb1YrbbkcS_X-qP_PHT_zE6HwmTjSgbEhDTyej3qVMuXWBR1ptIAjmbz9ZSNQJYQmNZer8HFJuf_m-y7uKTjPUuZ4dDgQs2o43_JdDAy5uveleQrgPi4emgD4uvbtjUGgX2Ok3vYoMmAmSg3DrqNYCggSqx4saUiEFpZaqHdj9ZVGGQjfWvpa8GeNOyGv53nelhDOAf1uNQ4rIPBHyVVaGdBrgImPG4XzvDpnkKM6');
+                  "
+                ></div>
+                <span
+                  class="absolute top-4 left-4 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow-sm"
+                  >Sports</span
+                >
+              </div>
+              <div class="flex flex-col flex-1 p-8">
+                <div
+                  class="flex items-center gap-2 text-base font-medium text-text-secondary dark:text-gray-400 mb-4"
+                >
+                  <span>Sports Center</span>
+                </div>
+                <h3
+                  class="text-3xl font-bold text-text-main dark:text-white mb-4 leading-tight group-hover:text-primary transition-colors"
+                >
+                  Championship Finals Set to Break Viewership Records
+                </h3>
+                <p
+                  class="text-text-secondary dark:text-gray-400 text-lg leading-relaxed mb-8"
+                >
+                  Analysts predict the upcoming finals series will be the most
+                  watched sporting event of the decade. The rivalry between the
+                  two top teams has intensified, drawing attention from fans
+                  worldwide.
+                </p>
+                <div
+                  class="mt-auto pt-6 border-t border-border-light dark:border-border-dark flex justify-start items-center"
+                >
+                  <a
+                    class="text-primary text-lg font-bold flex items-center gap-1 group/link"
+                    href="#"
+                  >
+                    Read More
+                    <span
+                      class="material-symbols-outlined text-[24px] transition-transform group-hover/link:translate-x-1"
+                      >arrow_forward</span
+                    >
+                  </a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
