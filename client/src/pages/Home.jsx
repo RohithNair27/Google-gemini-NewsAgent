@@ -5,9 +5,10 @@ import LoadingScreen from "../components/LoadingScreen";
 import "../Home.css";
 import { MdOutlineArrowOutward, MdSearchOff } from "react-icons/md";
 import { setApiKey, getNews } from "../services/Endpoint";
+import { useError } from "../context/error/useError";
+import { useApp } from "../context/app/useApp";
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(false);
   const [userPreference, setUserPreference] = useState({
     location: "",
     category: "",
@@ -18,16 +19,20 @@ export default function Home() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  const { handleError } = useError();
+  const { hasApiKey, addApiKey } = useApp();
+
   useEffect(() => {
     localStorage.setItem("newsArticles", JSON.stringify(articles));
   }, [articles]);
 
   async function onSaveApiKey() {
-    if (API_KEY.length == 1) {
-      throw new Error("Empty API key");
+    try {
+      console.log("Saving API key");
+      await setApiKey(API_KEY);
+    } catch (error) {
+      handleError(error);
     }
-    console.log("here");
-    await setApiKey(API_KEY);
   }
 
   function onChangeUserPrefernce(type, e) {
@@ -38,16 +43,16 @@ export default function Home() {
   }
 
   const handleSearch = async () => {
-    setIsLoading(true);
     try {
-      const data = await getNews(userPreference.location, userPreference.category);
+      const data = await getNews(
+        userPreference.location,
+        userPreference.category
+      );
       if (data) {
         setArticles(data);
       }
     } catch (error) {
       console.error("Failed to fetch news:", error);
-    } finally {
-        setIsLoading(false);
     }
   };
 
@@ -67,7 +72,6 @@ export default function Home() {
           setApiKey={SET_API_KEY}
           onSaveApiKey={onSaveApiKey}
         />
-        {isLoading && <LoadingScreen />}
 
         {/* Main Content */}
         <section className="main-content">
@@ -93,7 +97,9 @@ export default function Home() {
                       <p className="card-summary">{item.summary}</p>
                     </div>
                     <div className="card-footer">
-                      <div className="source">Source: {item.source_name || item.source}</div>
+                      <div className="source">
+                        Source: {item.source_name || item.source}
+                      </div>
                       <MdOutlineArrowOutward className="arrow-icon" />
                     </div>
                   </div>
@@ -111,7 +117,6 @@ export default function Home() {
             )}
           </div>
         </section>
-
       </div>
     </>
   );

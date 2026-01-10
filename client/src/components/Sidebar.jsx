@@ -2,7 +2,8 @@ import { useState } from "react";
 import { MdVpnKey, MdClose } from "react-icons/md";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaBoxes } from "react-icons/fa";
-
+import { useError } from "../context/error/useError";
+import { useApp } from "../context/app/useApp";
 export default function Sidebar({
   onSearch,
   input,
@@ -12,18 +13,36 @@ export default function Sidebar({
   onSaveApiKey,
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const { handleError } = useError();
+  const { isKeyConfigured, setKeyConfigured } = useApp();
 
   function toggleModal() {
     setIsModalOpen(!isModalOpen);
+    setHasError(false);
   }
 
   const saveKey = () => {
+    if (!API_KEY || API_KEY.trim().length === 0) {
+      setHasError(true);
+      return;
+    }
+    setHasError(false);
     setIsModalOpen(!isModalOpen);
+    setKeyConfigured(true); // Update context
     onSaveApiKey();
   };
 
   const handleSearchClick = () => {
     if (onSearch) {
+      if (!isKeyConfigured) {
+        handleError(
+          new Error("API Key is required"),
+          "API Key is required. Please enter your API key."
+        );
+        return;
+      }
+      setHasError(false);
       onSearch();
     }
   };
@@ -69,8 +88,8 @@ export default function Sidebar({
                 className="filter-select"
                 onChange={(e) => onChange("category", e)}
               >
-                <option>Technology</option>
                 <option>All Headlines</option>
+                <option>Technology</option>
                 <option>Environment</option>
                 <option>Finance</option>
                 <option>Culture</option>
@@ -91,7 +110,9 @@ export default function Sidebar({
         <div className="api-key-trigger" onClick={toggleModal}>
           <div className="glow-effect"></div>
           <div className="trigger-content">
-            <span className="trigger-text">Add API Key</span>
+            <span className="trigger-text">
+              {isKeyConfigured ? "API Key Added" : "Add API Key"}
+            </span>
             <MdVpnKey style={{ fontSize: "14px" }} />
           </div>
         </div>
@@ -130,13 +151,35 @@ export default function Sidebar({
                   API Key
                 </label>
                 <input
-                  className="filter-input"
-                  style={{ border: "1px solid #e5e7eb" }}
+                  className={`filter-input ${hasError ? "error" : ""}`}
+                  style={{
+                    border: hasError
+                      ? "2px solid #ef4444"
+                      : "1px solid #e5e7eb",
+                    outline: hasError ? "none" : undefined,
+                  }}
                   placeholder="sk-..."
                   type="password"
                   value={API_KEY}
-                  onChange={(e) => setApiKey(e.target.value)}
+                  onChange={(e) => {
+                    setApiKey(e.target.value);
+                    if (hasError && e.target.value.trim().length > 0) {
+                      setHasError(false); // Clear error when user starts typing
+                    }
+                  }}
                 />
+                {hasError && (
+                  <p
+                    style={{
+                      color: "#ef4444",
+                      fontSize: "0.75rem",
+                      marginTop: "0.25rem",
+                      marginBottom: "0",
+                    }}
+                  >
+                    API Key is required. Please enter your API key.
+                  </p>
+                )}
               </div>
               <div className="modal-actions">
                 <button className="btn btn-secondary" onClick={toggleModal}>

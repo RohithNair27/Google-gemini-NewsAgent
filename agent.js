@@ -39,6 +39,5 @@ export async function getLatestNews(
     },
   });
   const cleanedResponse = rawResponse.text.replace(/```json|```/g, "").trim();
-  console.log(cleanedResponse);
   return JSON.parse(cleanedResponse);
 }

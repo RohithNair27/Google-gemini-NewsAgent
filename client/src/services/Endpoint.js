@@ -6,7 +6,7 @@ export async function getNews(location, category) {
   let response = await fetch(`${import.meta.env.VITE_BASE_URL}/news`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json", 
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
   });
@@ -23,4 +23,22 @@ export async function setApiKey(GEMINI_API_KEY) {
     },
   });
   return await response.json();
+}
+
+export async function checkApiKeyExists(userId) {
+  let body = {
+    userId: userId,
+  };
+  let response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/auth/check-userId`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "Application/json",
+      },
+      body: JSON.stringify(body),
+    }
+  );
+  console.log(response);
+  // return response
 }
