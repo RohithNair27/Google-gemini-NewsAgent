@@ -16,6 +16,7 @@ export async function handleGeminiKey(req, res) {
         req.on("end", async () => {
           try {
             body = JSON.parse(body);
+            console.log(body);
             let isExists = getGeminiKey(body.userId);
             if (isExists) {
               res.writeHead(200, {

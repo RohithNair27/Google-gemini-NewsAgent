@@ -14,8 +14,9 @@ export default function Sidebar({
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [hasLocationError, setHasLocationError] = useState(false);
   const { handleError } = useError();
-  const { isKeyConfigured, setKeyConfigured } = useApp();
+  const { userId } = useApp();
 
   function toggleModal() {
     setIsModalOpen(!isModalOpen);
@@ -29,22 +30,26 @@ export default function Sidebar({
     }
     setHasError(false);
     setIsModalOpen(!isModalOpen);
-    setKeyConfigured(true); // Update context
     onSaveApiKey();
   };
 
   const handleSearchClick = () => {
-    if (onSearch) {
-      if (!isKeyConfigured) {
-        handleError(
-          new Error("API Key is required"),
-          "API Key is required. Please enter your API key."
-        );
-        return;
-      }
-      setHasError(false);
-      onSearch();
+    if (!userId) {
+      handleError(
+        new Error("API Key is required"),
+        "API Key is required. Please enter your API key."
+      );
+      return;
     }
+
+    if (!input.location || input.location.trim().length === 0) {
+      setHasLocationError(true);
+      return;
+    }
+
+    setHasError(false);
+    setHasLocationError(false);
+    onSearch();
   };
 
   return (
@@ -69,14 +74,35 @@ export default function Sidebar({
             <div className="input-wrapper">
               <FaLocationDot className="material-icons input-icon" />
               <input
-                className="filter-input"
+                className={`filter-input ${hasLocationError ? "error" : ""}`}
+                style={{
+                  border: hasLocationError ? "2px solid #ef4444" : "",
+                  outline: hasLocationError ? "none" : undefined,
+                }}
                 placeholder="e.g. New York, USA"
                 value={input.location}
                 type="text"
                 defaultValue="San Francisco, USA"
-                onChange={(e) => onChange("location", e)}
+                onChange={(e) => {
+                  onChange("location", e);
+                  if (hasLocationError && e.target.value.trim().length > 0) {
+                    setHasLocationError(false);
+                  }
+                }}
               />
             </div>
+            {hasLocationError && (
+              <p
+                style={{
+                  color: "#ef4444",
+                  fontSize: "0.75rem",
+                  marginTop: "0.25rem",
+                  marginBottom: "0",
+                }}
+              >
+                Location is required. Please enter a location.
+              </p>
+            )}
           </div>
 
           <div className="filter-group">
@@ -111,7 +137,7 @@ export default function Sidebar({
           <div className="glow-effect"></div>
           <div className="trigger-content">
             <span className="trigger-text">
-              {isKeyConfigured ? "API Key Added" : "Add API Key"}
+              {userId ? "API Key Added" : "Add API Key"}
             </span>
             <MdVpnKey style={{ fontSize: "14px" }} />
           </div>

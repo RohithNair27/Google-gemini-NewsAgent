@@ -8,8 +8,8 @@ import { setApiKey, getNews } from "../services/Endpoint";
 import { useError } from "../context/error/useError";
 import { useApp } from "../context/app/useApp";
 import {
-  getUserIdFromLocalStorage,
-  // setUserIdInLocalStorage,
+  // getUserIdFromLocalStorage,
+  setUserIdInLocalStorage,
 } from "../utils/storage";
 
 export default function Home() {
@@ -18,35 +18,43 @@ export default function Home() {
     category: "",
   });
   const [GEMINI_API_KEY, SET_GEMINI_API_KEY] = useState("");
-  const [articles, setArticles] = useState(() => {
-    const saved = localStorage.getItem("newsArticles");
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [articles, setArticles] = useState([]);
 
   const { handleError, handleSuccess } = useError();
-  const { setUserId } = useApp();
+  const { setUserId, userId } = useApp();
 
-  useEffect(() => {
-    localStorage.setItem("newsArticles", JSON.stringify(articles));
-  }, [articles]);
+  // useEffect(() => {
+  //   localStorage.setItem("newsArticles", JSON.stringify(articles));
+  // }, [articles]);
+
+  // Runs when the app loads and brings the news
+  async function getInitalNews() {
+    console.log("on load of page");
+    if (userId) {
+      const data = await getNews("World news", "All Headlines");
+      setArticles(data);
+    }
+  }
 
   // User adds a new API key
   async function onSaveApiKey() {
+    console.log("userId", userId);
     try {
-      let localUserId = getUserIdFromLocalStorage();
-      if (!localUserId) {
+      if (!userId) {
         let response = await setApiKey(GEMINI_API_KEY);
         setUserId(response.userId);
+        setUserIdInLocalStorage(response.userId);
         handleSuccess(response.message);
         console.log(response);
       } else {
-        handleError("Key already exists");
+        throw new Error("Key already exists");
       }
     } catch (error) {
       handleError(error);
     }
   }
 
+  // User adds location and category
   function onChangeUserPrefernce(type, e) {
     let val = e.target.value;
     setUserPreference((prev) => {
@@ -54,6 +62,7 @@ export default function Home() {
     });
   }
 
+  // when search button is pressed
   const handleSearch = async () => {
     try {
       const data = await getNews(
@@ -67,6 +76,10 @@ export default function Home() {
       console.error("Failed to fetch news:", error);
     }
   };
+
+  useEffect(() => {
+    getInitalNews();
+  }, []);
 
   return (
     <>
@@ -101,9 +114,9 @@ export default function Home() {
                   <div className="card-content">
                     <div>
                       <div className="card-meta">
-                        <span className="category-tag">{item.category}</span>
+                        {/* <span className="category-tag">{item.category}</span>
                         <span className="separator"></span>
-                        <span className="date">{item.date}</span>
+                        <span className="date">{item.date}</span> */}
                       </div>
                       <h3 className="card-title">{item.title}</h3>
                       <p className="card-summary">{item.summary}</p>
