@@ -7,29 +7,41 @@ import { MdOutlineArrowOutward, MdSearchOff } from "react-icons/md";
 import { setApiKey, getNews } from "../services/Endpoint";
 import { useError } from "../context/error/useError";
 import { useApp } from "../context/app/useApp";
+import {
+  getUserIdFromLocalStorage,
+  // setUserIdInLocalStorage,
+} from "../utils/storage";
 
 export default function Home() {
   const [userPreference, setUserPreference] = useState({
     location: "",
     category: "",
   });
-  const [API_KEY, SET_API_KEY] = useState("");
+  const [GEMINI_API_KEY, SET_GEMINI_API_KEY] = useState("");
   const [articles, setArticles] = useState(() => {
     const saved = localStorage.getItem("newsArticles");
     return saved ? JSON.parse(saved) : [];
   });
 
-  const { handleError } = useError();
-  const { hasApiKey, addApiKey } = useApp();
+  const { handleError, handleSuccess } = useError();
+  const { setUserId } = useApp();
 
   useEffect(() => {
     localStorage.setItem("newsArticles", JSON.stringify(articles));
   }, [articles]);
 
+  // User adds a new API key
   async function onSaveApiKey() {
     try {
-      console.log("Saving API key");
-      await setApiKey(API_KEY);
+      let localUserId = getUserIdFromLocalStorage();
+      if (!localUserId) {
+        let response = await setApiKey(GEMINI_API_KEY);
+        setUserId(response.userId);
+        handleSuccess(response.message);
+        console.log(response);
+      } else {
+        handleError("Key already exists");
+      }
     } catch (error) {
       handleError(error);
     }
@@ -68,8 +80,8 @@ export default function Home() {
           onSearch={handleSearch}
           input={userPreference}
           onChange={onChangeUserPrefernce}
-          API_KEY={API_KEY}
-          setApiKey={SET_API_KEY}
+          API_KEY={GEMINI_API_KEY}
+          setApiKey={SET_GEMINI_API_KEY}
           onSaveApiKey={onSaveApiKey}
         />
 

@@ -7,3 +7,13 @@ export const getUserIdFromLocalStorage = () => {
     return null;
   }
 };
+
+export const setUserIdInLocalStorage = (userId) => {
+  try {
+    localStorage.setItem('userId', userId);
+    return true;
+  } catch (error) {
+    console.error('Error setting userId in localStorage:', error);
+    return false;
+  }
+};

@@ -1,7 +1,7 @@
 import { Console } from "console";
 import url from "url";
 import { storeGeminiKey, getGeminiKey } from "../utils/auth.js";
-// import { storeKey } from "../agent.js";
+import { randomUUID } from "crypto";
 
 export async function handleGeminiKey(req, res) {
   let parsedUrl = url.parse(req.url, true);
@@ -39,45 +39,43 @@ export async function handleGeminiKey(req, res) {
           } catch (error) {}
         });
       }
-    case "/auth/set-keys":
+    case "/auth/set-key":
       if (req.method === "POST") {
-        const authHeader = req.headers["authorization"];
-        let body = "";
-        req.on("date", (chunk) => (body += chunk.toString()));
-        req.on("end", () => {
-          try {
-            if (authHeader) {
-              let body = JSON.parse(body);
-              storeKey(authHeader.split(" ")[1]);
-              let isStored = storeGeminiKey(body.userId, authHeader);
-              if (isStored.success) {
-                res.writeHead(200, {
-                  "content-type": "application/json",
-                });
-                res.end(
-                  JSON.stringify({
-                    userId: isStored.userId,
-                    message: "Successfully key is stored",
-                  })
-                );
-              } else {
-                res.writeHead(400, {
-                  "content-type": "application/json",
-                });
-                res.end(
-                  JSON.stringify({
-                    userId: null,
-                    message: "User not found, kindly enter your key again.",
-                  })
-                );
-              }
-            }
-          } catch (error) {}
-        });
-        //unsafe but for testing
+        let authHeader = req.headers["authorization"];
+        let token = authHeader.split(" ")[1];
+        try {
+          const userId = randomUUID();
+          let isStored = storeGeminiKey(userId, token);
+          console.log(isStored);
+          if (isStored.success) {
+            res.writeHead(200, {
+              "content-type": "application/json",
+            });
+            res.end(
+              JSON.stringify({
+                userId: isStored.userId,
+                message: "Successfully key is stored",
+              })
+            );
+          } else {
+            res.writeHead(400, {
+              "content-type": "application/json",
+            });
+            res.end(
+              JSON.stringify({
+                userId: isStored.userId,
+                message: "Unable to create",
+              })
+            );
+          }
+        } catch (error) {
+          res.writeHead(500, { "content-type": "application/json" });
+          res.end(
+            JSON.stringify({
+              message: "Internal Server Error",
+            })
+          );
+        }
       }
   }
-
-  // res.writeHead(200, { "Content-Type": "application/json" });
-  // res.end(JSON.stringify({ message: "Key is stored" }));
 }
