@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { MdVpnKey, MdClose } from "react-icons/md";
-import { FaLocationDot } from "react-icons/fa6";
+import { MdClose } from "react-icons/md";
+import { FaLocationDot, FaGoogle } from "react-icons/fa6";
 import { FaBoxes } from "react-icons/fa";
 import { useError } from "../context/error/useError";
 import { useApp } from "../context/app/useApp";
@@ -8,29 +8,20 @@ export default function Sidebar({
   onSearch,
   input,
   onChange,
-  API_KEY,
-  setApiKey,
-  onSaveApiKey,
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const [hasLocationError, setHasLocationError] = useState(false);
   const { handleError } = useError();
   const { userId } = useApp();
 
   function toggleModal() {
     setIsModalOpen(!isModalOpen);
-    setHasError(false);
   }
 
-  const saveKey = () => {
-    if (!API_KEY || API_KEY.trim().length === 0) {
-      setHasError(true);
-      return;
-    }
-    setHasError(false);
-    setIsModalOpen(!isModalOpen);
-    onSaveApiKey();
+  const handleGoogleLogin = () => {
+    // TODO: Implement Google OAuth login
+    console.log("Google login clicked");
+    setIsModalOpen(false);
   };
 
   const handleSearchClick = () => {
@@ -137,9 +128,9 @@ export default function Sidebar({
           <div className="glow-effect"></div>
           <div className="trigger-content">
             <span className="trigger-text">
-              {userId ? "API Key Added" : "Add API Key"}
+              {userId ? "Logged In" : "Login with Google"}
             </span>
-            <MdVpnKey style={{ fontSize: "14px" }} />
+            <FaGoogle style={{ fontSize: "14px" }} />
           </div>
         </div>
       </aside>
@@ -152,69 +143,32 @@ export default function Sidebar({
             </button>
             <div className="mb-6">
               <div className="key-icon-wrapper">
-                <MdVpnKey />
+                <FaGoogle />
               </div>
-              <h3 className="modal-title">Connect API</h3>
+              <h3 className="modal-title">Login to Continue</h3>
               <p className="modal-desc">
-                Enter your API key to unlock news summarization and personalized
-                AI insights. Your key is stored locally.
+                Sign in with your Google account to access personalized news and AI insights.
               </p>
             </div>
             <div
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
-              <div>
-                <label
-                  style={{
-                    display: "block",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    color: "#374151",
-                    textTransform: "uppercase",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  API Key
-                </label>
-                <input
-                  className={`filter-input ${hasError ? "error" : ""}`}
-                  style={{
-                    border: hasError
-                      ? "2px solid #ef4444"
-                      : "1px solid #e5e7eb",
-                    outline: hasError ? "none" : undefined,
-                  }}
-                  placeholder="sk-..."
-                  type="password"
-                  value={API_KEY}
-                  onChange={(e) => {
-                    setApiKey(e.target.value);
-                    if (hasError && e.target.value.trim().length > 0) {
-                      setHasError(false); // Clear error when user starts typing
-                    }
-                  }}
-                />
-                {hasError && (
-                  <p
-                    style={{
-                      color: "#ef4444",
-                      fontSize: "0.75rem",
-                      marginTop: "0.25rem",
-                      marginBottom: "0",
-                    }}
-                  >
-                    API Key is required. Please enter your API key.
-                  </p>
-                )}
-              </div>
-              <div className="modal-actions">
-                <button className="btn btn-secondary" onClick={toggleModal}>
-                  Cancel
-                </button>
-                <button className="btn btn-primary" onClick={saveKey}>
-                  Save Key
-                </button>
-              </div>
+              <button 
+                className="btn btn-primary"
+                onClick={handleGoogleLogin}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: "0.5rem"
+                }}
+              >
+                <FaGoogle />
+                Login with Google
+              </button>
+              <button className="btn btn-secondary" onClick={toggleModal}>
+                Cancel
+              </button>
             </div>
           </div>
         </div>

@@ -2,7 +2,6 @@ import { getLatestNews } from "../agent.js";
 import url from "url";
 
 export async function handleNewsRequests(req, res) {
-  console.log("iNSIDE NEWS");
   let parsedUrl = url.parse(req.url, true); // splits the web address and create objects out of it.
   let pathname = parsedUrl.pathname;
   let query = parsedUrl.query;

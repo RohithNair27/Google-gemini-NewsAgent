@@ -1,12 +1,27 @@
 import { Console } from "console";
 import url from "url";
-import { storeGeminiKey, getGeminiKey } from "../utils/auth.js";
+import {
+  storeGeminiKey,
+  getGeminiKey,
+  getGoogleAuthUrl,
+  getGoogleJWTToken,
+} from "../utils/auth.js";
 import { randomUUID } from "crypto";
 
 export async function handleGeminiKey(req, res) {
   let parsedUrl = url.parse(req.url, true);
+  console.log(parsedUrl.pathname);
 
   switch (parsedUrl.pathname) {
+    case "/auth/google":
+      if (req.method == "GET") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(getGoogleAuthUrl());
+      }
+    case "/auth/getGoogleToken":
+      if (req.method == "POST") {
+        getGoogleJWTToken().then().catch();
+      }
     case "/auth/check-userId":
       if (req.method === "GET") {
         let body = "";
@@ -78,5 +93,7 @@ export async function handleGeminiKey(req, res) {
           );
         }
       }
+    default:
+      res.end("Not found");
   }
 }
