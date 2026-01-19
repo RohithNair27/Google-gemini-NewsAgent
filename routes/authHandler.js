@@ -8,20 +8,51 @@ import {
 } from "../utils/auth.js";
 import { randomUUID } from "crypto";
 
+export function getDataFromBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = "";
+
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+
+    req.on("error", (err) => {
+      reject(err);
+    });
+
+    req.on("end", () => {
+      try {
+        if (!body) {
+          resolve({});
+        } else {
+          resolve(JSON.parse(body));
+        }
+      } catch (error) {
+        reject(new Error("Invalid JSON format"));
+      }
+    });
+  });
+}
+
 export async function handleGeminiKey(req, res) {
   let parsedUrl = url.parse(req.url, true);
   console.log(parsedUrl.pathname);
 
   switch (parsedUrl.pathname) {
     case "/auth/google":
+      let url = getGoogleAuthUrl();
       if (req.method == "GET") {
-        res.writeHead(200, { "Content-Type": "application/json" });
-        res.end(getGoogleAuthUrl());
+        res.writeHead(302, { "content-typ": "application/json" });
+        res.end(JSON.stringify({ url: url }));
       }
-    case "/auth/getGoogleToken":
+      break;
+    case "/auth/google/token":
       if (req.method == "POST") {
-        getGoogleJWTToken().then().catch();
+        let body = await getDataFromBody(req, res);
+        let response = await getGoogleJWTToken(body.google_code);
+        res.end(JSON.stringify(response));
       }
+      break;
     case "/auth/check-userId":
       if (req.method === "GET") {
         let body = "";
@@ -41,7 +72,7 @@ export async function handleGeminiKey(req, res) {
                 JSON.stringify({
                   exists: true,
                   message: "User key found.",
-                })
+                }),
               );
             } else {
               res.writeHead(404, { "Content-Type": "application/json" });
@@ -49,12 +80,13 @@ export async function handleGeminiKey(req, res) {
                 JSON.stringify({
                   exists: false,
                   message: "User not found, kindly enter your key again.",
-                })
+                }),
               );
             }
           } catch (error) {}
         });
       }
+      break;
     case "/auth/set-key":
       if (req.method === "POST") {
         let authHeader = req.headers["authorization"];
@@ -71,7 +103,7 @@ export async function handleGeminiKey(req, res) {
               JSON.stringify({
                 userId: isStored.userId,
                 message: "Successfully key is stored",
-              })
+              }),
             );
           } else {
             res.writeHead(400, {
@@ -81,7 +113,7 @@ export async function handleGeminiKey(req, res) {
               JSON.stringify({
                 userId: isStored.userId,
                 message: "Unable to create",
-              })
+              }),
             );
           }
         } catch (error) {
@@ -89,10 +121,11 @@ export async function handleGeminiKey(req, res) {
           res.end(
             JSON.stringify({
               message: "Internal Server Error",
-            })
+            }),
           );
         }
       }
+      break;
     default:
       res.end("Not found");
   }

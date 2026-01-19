@@ -37,8 +37,31 @@ export async function checkApiKeyExists(userId) {
         "Content-Type": "Application/json",
       },
       body: JSON.stringify(body),
-    }
+    },
   );
   console.log(response);
   // return response
+}
+
+export async function getGoogleAuthUrl() {
+  let response = await fetch(`${import.meta.env.VITE_BASE_URL}/auth/google`, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return response.json();
+}
+
+export async function exchangeCodeForToken(code) {
+  let response = await fetch(
+    `${import.meta.env.VITE_BASE_URL}/auth/google/token`,
+    {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify({ google_code: code }),
+    },
+  );
+  return response;
 }

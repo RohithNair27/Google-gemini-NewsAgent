@@ -5,7 +5,7 @@ import url from "url";
 
 export async function mainRouter(req, res) {
   // handling cors
-  res.setHeader("Access-Control-Allow-Origin", config.CORS_ORIGIN);
+  res.setHeader("Access-Control-Allow-Origin", "*"||config.CORS_ORIGIN);
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
   if (req.method === "OPTIONS") {

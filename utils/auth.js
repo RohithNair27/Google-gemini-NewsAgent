@@ -2,20 +2,12 @@ import fs, { access } from "fs";
 import path from "path";
 import querystring from "querystring";
 import { config } from "../config.js";
+import { OAuth2Client } from "google-auth-library";
 
-const keysFilePath = path.join(process.cwd(), "keys.json");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Load keys from JSON file
 let userGeminiKeys = {};
-try {
-  if (fs.existsSync(keysFilePath)) {
-    const keysData = fs.readFileSync(keysFilePath, "utf8");
-    userGeminiKeys = JSON.parse(keysData);
-  }
-} catch (error) {
-  console.error("Error loading keys from file:", error);
-  userGeminiKeys = {};
-}
 
 export function storeGeminiKey(userId, geminiKey) {
   console.log(userId, geminiKey);
@@ -42,6 +34,7 @@ export function getGeminiKey(userId) {
   return userGeminiKeys[userId] || null;
 }
 
+// send the url to fontned
 export function getGoogleAuthUrl(req, res) {
   const root_url = "https://accounts.google.com/o/oauth2/v2/auth";
   const parameters = querystring.stringify({
@@ -52,20 +45,50 @@ export function getGoogleAuthUrl(req, res) {
     scope: [
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
+      "https://www.googleapis.com/auth/generative-language.retriever",
     ].join(" "),
   });
 
   return `${root_url}?${parameters}`;
 }
 
-export async function getGoogleJWTToken(id_token) {
+// use the code we send a request to get token from google
+export async function getGoogleJWTToken(code) {
   const root_url = "https://oauth2.googleapis.com/token";
   const query_parameter = {
+    code: code,
     client_id: config.GOOGLE_CLIENT_ID,
     client_secret: config.GOOGLE_CLIENT_SECRET,
+    redirect_uri: "http://localhost:5173" || config.CLIENT_REDIRECT_URI,
+    grant_type: "authorization_code",
   };
   const queryString = new URLSearchParams(query_parameter).toString();
   const urlWithParams = `${root_url}?${queryString}`;
-  let response = await fetch(urlWithParams);
-  console.log(response);
+  let response = await fetch(urlWithParams, {
+    method: "POST",
+    headers: {
+      "Content-type": "application/x-www-form-urlencoded",
+    },
+  });
+  const data = await response.json();
+  console.log("Data received:", data);
+  let verifiedData = verifyGoogleToken(data?.id_token);
+  console.log(verifiedData);
+  // return verifiedData;
+}
+// If attacker manages to use a different app - client ID change
+async function verifyGoogleToken(idToken) {
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    console.log(payload);
+    return payload;
+  } catch (error) {
+    console.error("Token verification failed:", error);
+    return null;
+  }
 }

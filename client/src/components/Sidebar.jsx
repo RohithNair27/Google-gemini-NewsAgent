@@ -4,11 +4,13 @@ import { FaLocationDot, FaGoogle } from "react-icons/fa6";
 import { FaBoxes } from "react-icons/fa";
 import { useError } from "../context/error/useError";
 import { useApp } from "../context/app/useApp";
-export default function Sidebar({
-  onSearch,
-  input,
-  onChange,
-}) {
+import { getGoogleAuthUrl } from "../services/Endpoint";
+import { useSearchParams } from "react-router-dom";
+import { useEffect } from "react";
+import { exchangeCodeForToken } from "../services/Endpoint";
+export default function Sidebar({ onSearch, input, onChange }) {
+  const [searchParams] = useSearchParams();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [hasLocationError, setHasLocationError] = useState(false);
   const { handleError } = useError();
@@ -18,17 +20,18 @@ export default function Sidebar({
     setIsModalOpen(!isModalOpen);
   }
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google OAuth login
+  const handleGoogleLogin = async () => {
+    let response = await getGoogleAuthUrl();
     console.log("Google login clicked");
-    setIsModalOpen(false);
+    console.log(response);
+    window.location.assign(response.url);
   };
 
   const handleSearchClick = () => {
     if (!userId) {
       handleError(
         new Error("API Key is required"),
-        "API Key is required. Please enter your API key."
+        "API Key is required. Please enter your API key.",
       );
       return;
     }
@@ -38,10 +41,23 @@ export default function Sidebar({
       return;
     }
 
-    setHasError(false);
+    // setHasError(false);
     setHasLocationError(false);
     onSearch();
   };
+
+  useEffect(() => {
+    const code = searchParams.get("code");
+    console.log(code, "code");
+    if (code) {
+      console.log("auth/google/token called");
+      const sendCode = async () => {
+        let res = await exchangeCodeForToken(code);
+        console.log(res);
+      };
+      sendCode();
+    }
+  }, []);
 
   return (
     <>
@@ -147,20 +163,21 @@ export default function Sidebar({
               </div>
               <h3 className="modal-title">Login to Continue</h3>
               <p className="modal-desc">
-                Sign in with your Google account to access personalized news and AI insights.
+                Sign in with your Google account to access personalized news and
+                AI insights.
               </p>
             </div>
             <div
               style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
             >
-              <button 
+              <button
                 className="btn btn-primary"
                 onClick={handleGoogleLogin}
                 style={{
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  gap: "0.5rem"
+                  gap: "0.5rem",
                 }}
               >
                 <FaGoogle />
