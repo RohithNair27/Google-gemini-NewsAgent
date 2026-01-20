@@ -17,10 +17,10 @@ const ai = new GoogleGenAI({
 
 export async function getLatestNews(
   location = "USA",
-  category = "All categories"
+  category = "All categories",
 ) {
   const rawResponse = await ai.models.generateContent({
-    model: "gemini-2.5-flash", // Use the latest 2.5/3 models for better tool use
+    model: "gemini-2.5-flash",
     contents: `Search for 10 recent and trending news stories in ${location} for ${category}.
              Return a JSON array where each object has:
              "id", "title", "source_name","url" "summary of 300 words", and "suggested_search_query_for_image".

@@ -3,6 +3,7 @@ import path from "path";
 import querystring from "querystring";
 import { config } from "../config.js";
 import { OAuth2Client } from "google-auth-library";
+import { INSERT_USER_TOKEN, INSERT_USER } from "../db/init.js";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -40,12 +41,13 @@ export function getGoogleAuthUrl(req, res) {
   const parameters = querystring.stringify({
     client_id: config.GOOGLE_CLIENT_ID,
     redirect_uri: "http://localhost:5173" || config.CLIENT_REDIRECT_URI,
-    access_type: "offline",
+    access_type: "offline", // This provides the refresh token
     response_type: "code",
+    prompt: "consent",
     scope: [
       "https://www.googleapis.com/auth/userinfo.profile",
       "https://www.googleapis.com/auth/userinfo.email",
-      "https://www.googleapis.com/auth/generative-language.retriever",
+      "https://www.googleapis.com/auth/generative-language.retriever", // for gemini access
     ].join(" "),
   });
 
@@ -71,10 +73,8 @@ export async function getGoogleJWTToken(code) {
     },
   });
   const data = await response.json();
-  console.log("Data received:", data);
-  let verifiedData = verifyGoogleToken(data?.id_token);
+  let verifiedData = await verifyGoogleToken(data?.id_token);
   console.log(verifiedData);
-  // return verifiedData;
 }
 // If attacker manages to use a different app - client ID change
 async function verifyGoogleToken(idToken) {
@@ -85,7 +85,6 @@ async function verifyGoogleToken(idToken) {
     });
 
     const payload = ticket.getPayload();
-    console.log(payload);
     return payload;
   } catch (error) {
     console.error("Token verification failed:", error);
